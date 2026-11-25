@@ -25,8 +25,8 @@ class AttendanceRequest extends FormRequest
         return [
             'new_clock_in' => 'required|date_format:H:i',
             'new_clock_out' => 'nullable|date_format:H:i|after_or_equal:new_clock_in',
-            'new_break_in.*' => 'nullable|date_format:H:i|after_or_equal:new_clock_in|before_or_equal:new_clock_out',
-            'new_break_out.*' => 'nullable|date_format:H:i|before_or_equal:new_clock_out',
+            'new_break_in.*' => 'nullable|required_with:new_break_out.*|date_format:H:i|after_or_equal:new_clock_in|before_or_equal:new_clock_out',
+            'new_break_out.*' => 'nullable|date_format:H:i|after_or_equal:new_break_in.*|before_or_equal:new_clock_out',
             'comment' => 'required|max:255',
         ];
     }
