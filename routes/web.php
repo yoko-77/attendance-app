@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\AdminStaffAttendanceController;
+use App\Http\Controllers\ApplicationDetailController;
+use App\Http\Controllers\UserAttendanceController;
 use Illuminate\Support\Facades\Route;
 use Laravel\Fortify\Http\Controllers\AuthenticatedSessionController;
 
@@ -20,3 +23,16 @@ Route::get('/', function () {
 Route::view('/admin/login', 'admin.admin-login')->middleware('guest');
 Route::post('/admin/login', [AuthenticatedSessionController::class, 'store'])->middleware(['guest', 'throttle:login']);
 Route::post('/admin/logout', [AuthenticatedSessionController::class, 'destroy'])->middleware('auth');
+
+Route::controller(UserAttendanceController::class)->middleware(['auth', 'can:general'])->group(function () {
+    Route::get('/attendance', 'create');
+    Route::post('/attendance', 'store');
+});
+
+// Route::controller(ApplicationDetailController::class)->group(function () {
+//    Route::get('/URL', 'メソッド名');
+//    Route::post('/URL', 'メソッド名');});
+
+// Route::controller(AdminStaffAttendanceController::class)->group(function () {
+//    Route::get('/URL', 'メソッド名');
+//    Route::post('/URL', 'メソッド名');});
