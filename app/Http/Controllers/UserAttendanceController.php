@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use Carbon\Carbon;
+use Carbon\CarbonPeriod;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -45,5 +47,47 @@ class UserAttendanceController extends Controller
         }
 
         return redirect('/attendance');
+    }
+
+    public function index(Request $request)
+    {
+        $date = $request->query('date')
+            ? Carbon::parse($request->query('date'))->startOfMonth()
+            : now()->startOfMonth();
+        $previousMonth = $date->copy()->subMonthNoOverflow()->toDateString();
+        $nextMonth = $date->copy()->addMonthNoOverflow()->toDateString();
+
+        $attendanceRecords = Auth::user()->attendanceRecords()
+            ->with('breaks')
+            ->whereBetween('date', [$date->toDateString(), $date->copy()->endOfMonth()->toDateString()])
+            ->get()
+            ->keyBy('date');
+
+        $formattedAttendanceRecords = collect(CarbonPeriod::create($date, $date->copy()->endOfMonth())->toArray())
+            ->map(function ($currentDate) use ($attendanceRecords) {
+                $record = $attendanceRecords->get($currentDate->toDateString());
+
+                if ($record === null) {
+                    return [
+                        'id' => null,
+                        'date' => $currentDate->isoFormat('MM/DD(ddd)'),
+                        'clock_in' => null,
+                        'clock_out' => null,
+                        'total_break_time' => null,
+                        'total_time' => null,
+                    ];
+                }
+
+                return [
+                    'id' => $record->id,
+                    'date' => $currentDate->isoFormat('MM/DD(ddd)'),
+                    'clock_in' => Carbon::parse($record->clock_in)->format('H:i'),
+                    'clock_out' => $record->clock_out ? Carbon::parse($record->clock_out)->format('H:i') : null,
+                    'total_break_time' => $record->total_break_time,
+                    'total_time' => $record->total_time,
+                ];
+            });
+
+        return view('user.user-attendance-list', compact('date', 'previousMonth', 'nextMonth', 'formattedAttendanceRecords'));
     }
 }
