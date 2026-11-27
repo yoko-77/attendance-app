@@ -34,7 +34,7 @@ Route::controller(ApplicationDetailController::class)->middleware('auth')->group
     Route::get('/attendance/{id}', 'show');
     Route::post('/attendance/{id}', 'store');
     Route::get('/stamp_correction_request/list', 'index');
-    Route::get('/application/{id}', 'showApplication');
+    Route::get('/application/{id}', 'showApplication')->middleware('can:general');
 });
 
 // Route::controller(AdminStaffAttendanceController::class)->group(function () {
