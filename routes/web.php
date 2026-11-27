@@ -27,11 +27,15 @@ Route::post('/admin/logout', [AuthenticatedSessionController::class, 'destroy'])
 Route::controller(UserAttendanceController::class)->middleware(['auth', 'can:general'])->group(function () {
     Route::get('/attendance', 'create');
     Route::post('/attendance', 'store');
+    Route::get('/attendance/list', 'index');
 });
 
-// Route::controller(ApplicationDetailController::class)->group(function () {
-//    Route::get('/URL', 'メソッド名');
-//    Route::post('/URL', 'メソッド名');});
+Route::controller(ApplicationDetailController::class)->middleware('auth')->group(function () {
+    Route::get('/attendance/{id}', 'show');
+    Route::post('/attendance/{id}', 'store');
+    Route::get('/stamp_correction_request/list', 'index');
+    Route::get('/application/{id}', 'showApplication');
+});
 
 // Route::controller(AdminStaffAttendanceController::class)->group(function () {
 //    Route::get('/URL', 'メソッド名');

@@ -14,6 +14,7 @@ class ProposalBreak extends Model
         'application_id',
         'break_in',
         'break_out',
+        'break_id',
     ];
 
     public function application(): BelongsTo
